@@ -1,0 +1,16 @@
+{
+  "name": "mendeley-local-server",
+  "version": "1.0.0",
+  "description": "Local host SQLite database and sync server for Mendeley reference synchronization.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "sqlite3": "^5.1.7"
+  },
+  "private": true
+}

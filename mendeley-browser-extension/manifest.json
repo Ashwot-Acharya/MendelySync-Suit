@@ -1,0 +1,44 @@
+{
+  "manifest_version": 3,
+  "name": "Mendeley Local Syncer",
+  "version": "1.0.0",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "mendeley-local-syncer@ashwot.local",
+      "strict_min_version": "109.0"
+    }
+  },
+  "description": "Imports your Mendeley references and syncs them to your local SQLite database.",
+  "permissions": [
+    "storage",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "https://*.mendeley.com/*",
+    "http://localhost/*",
+    "http://127.0.0.1/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Mendeley Local Syncer"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.mendeley.com/*"
+      ],
+      "js": ["content-isolated.js"],
+      "run_at": "document_start",
+      "all_frames": true
+    },
+    {
+      "matches": [
+        "https://*.mendeley.com/*"
+      ],
+      "js": ["content-main.js"],
+      "run_at": "document_start",
+      "world": "MAIN",
+      "all_frames": true
+    }
+  ]
+}

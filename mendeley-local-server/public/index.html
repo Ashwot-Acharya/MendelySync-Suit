@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mendeley Local Sync Dashboard</title>
+  <meta name="description" content="Manage and view your imported Mendeley references locally. SQLite-powered repository.">
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="app.css">
+</head>
+<body>
+  <!-- Ambient background glow elements -->
+  <div class="glow-bg glow-1"></div>
+  <div class="glow-bg glow-2"></div>
+
+  <div class="container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-logo">
+        <div class="logo-icon">📚</div>
+        <div class="logo-text">
+          <h1>Mendeley Local Repository</h1>
+          <p>Local SQLite Sync Hub</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button id="btn-phone-sync" class="btn btn-secondary">
+          <span class="btn-icon">📱</span> Sync to Phone
+        </button>
+        <button id="btn-clear-db" class="btn btn-danger">
+          <span class="btn-icon">🗑️</span> Wipe Database
+        </button>
+      </div>
+    </header>
+
+    <!-- Stats Grid -->
+    <section class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">📄</div>
+        <div class="stat-info">
+          <h3 id="stat-total-references">0</h3>
+          <p>Total References</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🔬</div>
+        <div class="stat-info">
+          <h3 id="stat-journals">0</h3>
+          <p>Journal Articles</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">📅</div>
+        <div class="stat-info">
+          <h3 id="stat-recent-year">N/A</h3>
+          <p>Latest Pub Year</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🔌</div>
+        <div class="stat-info">
+          <h3 id="stat-network-status">Connected</h3>
+          <p>Server Offline Sync</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Content Layout -->
+    <main class="main-layout">
+      <!-- Sidebar Filters -->
+      <aside class="sidebar">
+        <div class="panel">
+          <h2>Filter by Type</h2>
+          <div id="filter-types-container" class="filter-list">
+            <!-- Dynamically populated type list -->
+          </div>
+        </div>
+
+        <div class="panel">
+          <h2>Filter by Year</h2>
+          <div id="filter-years-container" class="filter-list">
+            <!-- Dynamically populated year list -->
+          </div>
+        </div>
+
+        <div class="panel sync-panel">
+          <h2>Pair Mobile App</h2>
+          <p class="sync-desc">Sync your library to your phone by entering the IP address below in your mobile app:</p>
+          <div class="ip-list" id="ip-address-list">
+            <!-- Dynamically filled with network IPs -->
+          </div>
+          <div class="sync-instruction">
+            <span>💡</span> Both devices must be on the same Wi-Fi.
+          </div>
+        </div>
+      </aside>
+
+      <!-- Main Search & Results -->
+      <section class="content-area">
+        <div class="search-bar-container">
+          <input type="text" id="search-input" placeholder="Search by title, author, year, journal or abstract..." aria-label="Search references">
+          <div class="search-info">
+            Showing <span id="displayed-count">0</span> of <span id="total-count">0</span> items
+          </div>
+        </div>
+
+        <div id="references-container" class="references-list">
+          <div class="loading-state">
+            <div class="spinner"></div>
+            <p>Loading local repository...</p>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Detail Modal -->
+  <div id="detail-modal" class="modal" aria-hidden="true">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+      <button id="modal-close" class="modal-close-btn" aria-label="Close details">&times;</button>
+      <div class="modal-header">
+        <span id="modal-doc-type" class="badge">JOURNAL</span>
+        <h2 id="modal-doc-title">Document Title</h2>
+        <p id="modal-doc-authors" class="authors-list">Authors list</p>
+      </div>
+      <div class="modal-body">
+        <div class="modal-meta-row">
+          <div class="meta-item">
+            <span class="meta-label">Source</span>
+            <span id="modal-doc-source" class="meta-val">Journal of Science</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Year</span>
+            <span id="modal-doc-year" class="meta-val">2024</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">DOI</span>
+            <span id="modal-doc-doi" class="meta-val">N/A</span>
+          </div>
+        </div>
+        <div class="modal-section">
+          <h3>Abstract</h3>
+          <p id="modal-doc-abstract" class="abstract-text">Abstract content goes here...</p>
+        </div>
+        <div class="modal-section" id="modal-tags-section">
+          <h3>Tags</h3>
+          <div id="modal-doc-tags" class="tags-container"></div>
+        </div>
+        <div class="modal-section">
+          <h3>Raw Mendeley JSON</h3>
+          <pre><code id="modal-doc-raw"></code></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Pairing Modal -->
+  <div id="sync-modal" class="modal" aria-hidden="true">
+    <div class="modal-overlay"></div>
+    <div class="modal-content small-modal">
+      <button id="sync-modal-close" class="modal-close-btn" aria-label="Close sync modal">&times;</button>
+      <div class="modal-header">
+        <h2>📱 Sync Library to Phone</h2>
+        <p>Instructions for your React Native application</p>
+      </div>
+      <div class="modal-body">
+        <ol class="steps-list">
+          <li>Install and run the **React Native App** on your mobile device.</li>
+          <li>Ensure your phone is connected to the **same Wi-Fi network** as this computer.</li>
+          <li>Enter one of the following server URLs into your app's sync setup:</li>
+        </ol>
+        <div class="modal-ip-display" id="modal-ips-container">
+          <!-- Dynamically filled -->
+        </div>
+        <button id="sync-modal-ok" class="btn btn-primary" style="margin-top: 16px; width: 100%;">Got it!</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

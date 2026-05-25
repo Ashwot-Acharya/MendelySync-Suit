@@ -1,0 +1,18 @@
+{
+  "expo": {
+    "name": "Mendeley Mobile Repository",
+    "slug": "mendeley-mobile-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#070913",
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#070913"
+      }
+    }
+  }
+}
